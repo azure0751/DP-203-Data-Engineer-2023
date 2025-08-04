@@ -1,0 +1,53 @@
+[
+  {
+    "Name": "DP 203 : Data Engineering on Azure Env 01",
+    "Language": "English",
+    "BaseURL": "https://github.com/MicrosoftLearning/DP-203-Data-Engineer",
+    "Files": [
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/intro/Instructions/Labs/env01intro.md",
+        "Order": 1
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_01_compute_and_storage_options.md",
+        "Order": 2
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_03_data_transformation_in_databricks.md",
+        "Order": 3
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_04_data_warehouse_using_apache_spark.md",
+        "Order": 4
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_05_load_data_into_the_data_warehouse.md",
+        "Order": 5
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_06_transform_data_with_pipelines.md",
+        "Order": 6
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_07_integrate_data_from_notebooks.md",
+        "Order": 7
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_08_security_with_synapse_analytics.md",
+        "Order": 8
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_09_htap_with_azure_synapse_link.md",
+        "Order": 9
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_10_stream_analytics.md",
+        "Order": 10
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_11_stream_with_azure_databricks.md",
+        "Order": 11
+      }
+    ]
+  }
+]

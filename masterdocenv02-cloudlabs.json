@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "DP 203 : Data Engineering on Azure Env 02",
+    "Language": "English",
+    "BaseURL": "https://github.com/MicrosoftLearning/DP-203-Data-Engineer",
+    "Files": [
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/intro/Instructions/Labs/env02intro.md",
+        "Order": 1
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/CloudLabs-MOC/DP-203-Data-Engineer/master/Instructions/Labs/LAB_02_queries_using_serverless_sql_pools.md",
+        "Order": 2
+      }
+    ]
+  }
+]
