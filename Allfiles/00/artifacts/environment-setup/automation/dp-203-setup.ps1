@@ -150,7 +150,8 @@ while ($success -ne 1){
       $tried_list.Add($random_location)
       $locations = $locations | Where-Object {$_.Location -notin $tried_list}
       $rand = (0..$($locations.Count - 1)) | Get-Random
-      $random_location = $locations.Get($rand).Location
+      #$random_location = $locations.Get($rand).Location
+      $random_location ="centralus"  
     }
 }
 Remove-AzSqlServer -ResourceGroupName $resourceGroupName -ServerName $testServer | Out-Null
