@@ -13,7 +13,7 @@ $sqlScriptsPath = "..\sql"
 
 # User must sign in using az login
 Write-Host "Sign into Azure using your credentials.."
-az login
+az login --use-device-code
 
 # Now sign in again for PowerShell resource management and select subscription
 Write-Host "Now sign in again to allow this script to create resources..."
@@ -312,11 +312,18 @@ $dataLakeStorageBlobUrl = "https://"+ $dataLakeAccountName + ".blob.core.windows
 $dataLakeStorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $resourceGroupName -AccountName $dataLakeAccountName)[0].Value
 
 Write-Host "Dstorage account key  key : "$dataLakeStorageAccountKey
+
+try {
+
 $dataLakeContext = New-AzStorageContext -StorageAccountName $dataLakeAccountName -StorageAccountKey $dataLakeStorageAccountKey
 
 $destinationSasKey = New-AzStorageContainerSASToken -Container "wwi-02" -Context $dataLakeContext -Permission rwdl
 
 Write-Host "Destination Sas key : "$destinationSasKey
+}
+catch {
+    Write-Error "Error occurred: $_"
+}
 
 if ($download)
 {
