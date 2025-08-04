@@ -105,9 +105,9 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.Storage
 Register-AzResourceProvider -ProviderNamespace Microsoft.Compute
 
 # Generate a random suffix for unique Azure resource names
-# [string]$suffix =  -join ((48..57) + (97..122) | Get-Random -Count 7 | % {[char]$_})
+[string]$suffix =  -join ((48..57) + (97..122) | Get-Random -Count 7 | % {[char]$_})
 
-[string]$suffix ="grbowe5"
+#[string]$suffix ="grbowe5"
 Write-Host "Your randomly-generated suffix for Azure resources is $suffix"
 $resourceGroupName = "data-engineering-synapse-$suffix"
 
