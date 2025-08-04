@@ -328,7 +328,7 @@ catch {
 }
 
 if ($download)
-{
+{<#
         Write-Information "Copying wwi-02 directory to the data lake..."
         $wwi02 = Resolve-Path "../../../../wwi-02"
 
@@ -354,7 +354,47 @@ if ($download)
                 $destination = $dataLakeStorageBlobUrl + $path + $destinationSasKey
                 Write-Information "Copying directory $($source) to $($destination)"
                 & $azCopyCommand copy $source $destination --recursive=true
-        }
+        } 
+        #>
+
+        Write-Host "Copying wwi-02 directory contents to the data lake..."
+
+# Resolve local wwi-02 root path
+$wwi02 = Resolve-Path "../../../../wwi-02"
+
+# Retrieve storage context
+$storageAccount = Get-AzStorageAccount -ResourceGroupName $resourceGroupName -Name $dataLakeAccountName
+$storageContext = $storageAccount.Context
+
+# Define virtual folders and target blob folders
+$dataDirectories = @{
+    salesmall      = "sale-small"
+    analytics      = "campaign-analytics"
+    security       = "security"
+    salespoc       = "sale-poc"
+    datagenerators = "data-generators"
+    profiles1      = "online-user-profiles-01"
+    profiles2      = "online-user-profiles-02"
+    customerinfo   = "customer-info"
+}
+
+# Loop through all mappings
+foreach ($key in $dataDirectories.Keys) {
+    $subDir = $dataDirectories[$key]
+    $sourceDir = Join-Path $wwi02.Path $subDir
+
+    Write-Host ""
+    Write-Host "Uploading contents of '$sourceDir' to blob container path: '$subDir/'"
+
+    # Upload each file inside the subdirectory recursively
+    Get-ChildItem -Path $sourceDir -Recurse -File | ForEach-Object {
+        $relativePath = $_.FullName.Substring($sourceDir.Length).TrimStart('\', '/')
+        $blobPath = "$subDir/$relativePath" -replace '\\', '/'  # Convert to blob-friendly path
+        Write-Host "Uploading file: $($_.FullName) => $blobPath"
+        Set-AzStorageBlobContent -File $_.FullName -Container "files" -Blob $blobPath -Context $storageContext
+    }
+}
+
 }
 
 Refresh-Tokens
