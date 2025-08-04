@@ -105,7 +105,9 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.Storage
 Register-AzResourceProvider -ProviderNamespace Microsoft.Compute
 
 # Generate a random suffix for unique Azure resource names
-[string]$suffix =  -join ((48..57) + (97..122) | Get-Random -Count 7 | % {[char]$_})
+# [string]$suffix =  -join ((48..57) + (97..122) | Get-Random -Count 7 | % {[char]$_})
+
+[string]$suffix ="grbowe5"
 Write-Host "Your randomly-generated suffix for Azure resources is $suffix"
 $resourceGroupName = "data-engineering-synapse-$suffix"
 
@@ -157,13 +159,14 @@ Write-Host "Selected region: $random_location"
 
 # Use ARM template to deploy resources
 Write-Host "Creating Azure resources. This may take some time..."
+<#
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
   -TemplateFile "00-asa-workspace-core.json" `
   -Mode Complete `
   -uniqueSuffix $suffix `
   -sqlAdministratorLoginPassword $sqlPassword `
   -Force
-
+#>
 
 # Post-deployment configuration begins here
 Write-Host "Performing post-deployment configuration..."
@@ -267,6 +270,7 @@ Ensure-ValidTokens $true
 
 if ([System.Environment]::OSVersion.Platform -eq "Unix")
 {
+        Write-Host "Inside Unix"
         $azCopyLink = Check-HttpRedirect "https://aka.ms/downloadazcopy-v10-linux"
 
         if (!$azCopyLink)
@@ -284,6 +288,7 @@ if ([System.Environment]::OSVersion.Platform -eq "Unix")
 }
 else
 {
+        Write-Host "Inside windows box"
         $azCopyLink = Check-HttpRedirect "https://aka.ms/downloadazcopy-v10-windows"
 
         if (!$azCopyLink)
@@ -307,6 +312,8 @@ $dataLakeStorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $resour
 $dataLakeContext = New-AzStorageContext -StorageAccountName $dataLakeAccountName -StorageAccountKey $dataLakeStorageAccountKey
 
 $destinationSasKey = New-AzStorageContainerSASToken -Container "wwi-02" -Context $dataLakeContext -Permission rwdl
+
+Write-Host "Destination Sas key : "$destinationSasKey
 
 if ($download)
 {
