@@ -178,6 +178,61 @@
       }
     },
     {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2019-06-01",
+      "name": "[concat(variables('adlsStorageAccountName'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('adlsStorageAccountName'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Synapse/workspaces",
+      "apiVersion": "2019-06-01-preview",
+      "name": "[variables('workspaceName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('adlsStorageAccountName'), '/blobServices/default/containers/', variables('defaultDataLakeStorageFilesystemName'))]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "defaultDataLakeStorage": {
+          "accountUrl": "[variables('defaultDataLakeStorageAccountUrl')]",
+          "filesystem": "[variables('defaultDataLakeStorageFilesystemName')]"
+        },
+        "virtualNetworkProfile": {
+          "computeSubnetId": "[variables('computeSubnetId')]"
+        },
+        "sqlAdministratorLogin": "[variables('sqlAdministratorLogin')]",
+        "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]"
+      },
+      "resources": [
+        {
+          "type": "firewallrules",
+          "apiVersion": "2019-06-01-preview",
+          "name": "allowAll",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[concat('Microsoft.Synapse/workspaces/', variables('workspaceName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "255.255.255.255"
+          }
+        }
+      ]
+    },
+    {
       "type": "Microsoft.Storage/storageAccounts/blobServices/containers/providers/roleAssignments",
       "apiVersion": "2018-09-01-preview",
       "name": "[concat(variables('adlsStorageAccountName'), '/default/', variables('defaultDataLakeStorageFilesystemName'), '/Microsoft.Authorization/',  guid(concat(resourceGroup().id, '/', variables('storageBlobDataOwnerRoleID'), '/', variables('workspaceName'))))]",
@@ -189,6 +244,44 @@
         "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('storageBlobDataOwnerRoleID'))]",
         "principalId": "[reference(concat('Microsoft.Synapse/workspaces/', variables('workspaceName')), '2019-06-01-preview', 'Full').identity.principalId]",
         "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2018-09-01-preview",
+      "name": "[guid(concat(resourceGroup().id, '/', variables('storageBlobDataOwnerRoleID'), '/', variables('workspaceName'), '2'))]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Synapse/workspaces/', variables('workspaceName'))]"
+      ],
+      "properties": {
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('storageBlobDataOwnerRoleID'))]",
+        "principalId": "[reference(concat('Microsoft.Synapse/workspaces/', variables('workspaceName')), '2019-06-01-preview', 'Full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      }
+    },
+    {
+      "type": "Microsoft.Synapse/workspaces/bigDataPools",
+      "apiVersion": "2019-06-01-preview",
+      "name": "[concat(variables('workspaceName'), '/', variables('sparkComputeName'))]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Synapse/workspaces/', variables('workspaceName'))]"
+      ],
+      "properties": {
+        "nodeCount": "[variables('sparkNodeCount')]",
+        "nodeSizeFamily": "[variables('sparkNodeSizeFamily')]",
+        "nodeSize": "[variables('sparkNodeSize')]",
+        "autoScale": {
+          "enabled": "[variables('sparkAutoScaleEnabled')]",
+          "minNodeCount": "[variables('sparkMinNodeCount')]",
+          "maxNodeCount": "[variables('sparkMaxNodeCount')]"
+        },
+        "autoPause": {
+          "enabled": "[variables('sparkAutoPauseEnabled')]",
+          "delayInMinutes": "[variables('sparkAutoPauseDelayInMinutes')]"
+        },
+        "sparkVersion": "[variables('sparkVersion')]"
       }
     },
     {
@@ -336,9 +429,124 @@
           "throughput": 10000
         }
       }
-    } 
-   
-    
+    },
+    {
+        "type":"Microsoft.EventHub/namespaces",
+        "apiVersion":"2021-01-01-preview",
+        "name":"[variables('eventHubNameSpace')]",
+        "location": "[variables('location')]",
+        "sku":{
+          "name":"Standard",
+          "tier":"Standard",
+          "capacity":1
+        },
+        "properties":{
+          "zoneRedundant":false,
+          "isAutoInflateEnabled":false,
+          "maximumThroughputUnits":0,
+          "kafkaEnabled":true
+        }
+    },
+    {
+      "type":"Microsoft.EventHub/namespaces/AuthorizationRules",
+      "apiVersion":"2021-01-01-preview",
+      "name":"[concat(variables('eventHubNameSpace'), '/',variables('managedAccessPolicyName'))]",
+      "location": "[variables('location')]",
+      "dependsOn":[
+        "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNameSpace'))]"
+      ],
+      "properties":{
+        "rights":[
+            "Manage",
+            "Listen",
+            "Send"
+        ]
+      }
+  },
+  {
+      "type":"Microsoft.EventHub/namespaces/AuthorizationRules",
+      "apiVersion":"2021-01-01-preview",
+      "name":"[concat(variables('eventHubNameSpace'), '/RootManageSharedAccessKey')]",
+      "location": "[variables('location')]",
+      "dependsOn":[
+        "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNameSpace'))]"
+      ],
+      "properties":{
+        "rights":[
+            "Listen",
+            "Manage",
+            "Send"
+        ]
+      }
+  },
+  {
+      "type":"Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion":"2021-01-01-preview",
+      "name":"[concat(variables('eventHubNamespace'), '/', variables('eventHubName'))]",
+      "location": "[variables('location')]",
+      "dependsOn":[
+        "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+      ],
+      "properties":{
+        "messageRetentionInDays":1,
+        "partitionCount":8,
+        "status":"Active"
+      }
+  },
+  {
+      "type":"Microsoft.EventHub/namespaces/networkRuleSets",
+      "apiVersion":"2021-01-01-preview",
+      "name":"[concat(variables('eventHubNamespace'), '/default')]",
+      "location": "[variables('location')]",
+      "dependsOn":[
+        "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+      ],
+      "properties":{
+        "defaultAction":"Deny",
+        "virtualNetworkRules":[
+
+        ],
+        "ipRules":[
+
+        ]
+      }
+  },
+    {
+      "type":"Microsoft.StreamAnalytics/streamingjobs",
+      "apiVersion":"2019-06-01",
+      "name":"[variables('asaName')]",
+      "location": "[variables('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties":{
+        "sku":{
+            "name":"Standard"
+        },	
+        "eventsOutOfOrderPolicy":"Adjust",
+        "outputErrorPolicy":"Stop",
+        "eventsOutOfOrderMaxDelayInSeconds":0,
+        "eventsLateArrivalMaxDelayInSeconds":5,
+        "dataLocale":"en-US"
+      }
+    },
+    {
+      "type": "Microsoft.Databricks/workspaces",
+      "apiVersion": "2018-04-01",
+      "name": "[variables('databricksWorkspaceName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[variables('databricksPricingTier')]"
+      },
+      "properties": {
+        "managedResourceGroupId": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('managedResourceGroupName'))]",
+        "parameters": {
+          "enableNoPublicIp": {
+            "value": false
+          }
+        }
+      }
+    }
   ],
   "outputs": {}
 }
