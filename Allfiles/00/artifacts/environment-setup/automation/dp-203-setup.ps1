@@ -391,7 +391,7 @@ foreach ($key in $dataDirectories.Keys) {
         $relativePath = $_.FullName.Substring($sourceDir.Length).TrimStart('\', '/')
         $blobPath = "$subDir/$relativePath" -replace '\\', '/'  # Convert to blob-friendly path
         Write-Host "Uploading file: $($_.FullName) => $blobPath"
-        Set-AzStorageBlobContent -File $_.FullName -Container "files" -Blob $blobPath -Context $storageContext
+        Set-AzStorageBlobContent -File $_.FullName -Container "wwi-02" -Blob $blobPath -Context $storageContext
     }
 }
 
