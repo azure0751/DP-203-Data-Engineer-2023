@@ -130,7 +130,8 @@ $locations = Get-AzLocation | Where-Object {
 }
 $max_index = $locations.Count - 1
 $rand = (0..$max_index) | Get-Random
-$random_location = $locations.Get($rand).Location
+#$random_location = $locations.Get($rand).Location
+ $random_location ="centralus" 
 
 # Try to create a SQL Databasde resource to test for capacity constraints
 $success = 0
@@ -309,6 +310,8 @@ $download = $true;
 $dataLakeStorageUrl = "https://"+ $dataLakeAccountName + ".dfs.core.windows.net/"
 $dataLakeStorageBlobUrl = "https://"+ $dataLakeAccountName + ".blob.core.windows.net/"
 $dataLakeStorageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $resourceGroupName -AccountName $dataLakeAccountName)[0].Value
+
+Write-Host "Dstorage account key  key : "$dataLakeStorageAccountKey
 $dataLakeContext = New-AzStorageContext -StorageAccountName $dataLakeAccountName -StorageAccountKey $dataLakeStorageAccountKey
 
 $destinationSasKey = New-AzStorageContainerSASToken -Container "wwi-02" -Context $dataLakeContext -Permission rwdl
