@@ -160,14 +160,13 @@ Write-Host "Selected region: $random_location"
 
 # Use ARM template to deploy resources
 Write-Host "Creating Azure resources. This may take some time..."
-<#
+
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
   -TemplateFile "00-asa-workspace-core.json" `
   -Mode Complete `
   -uniqueSuffix $suffix `
   -sqlAdministratorLoginPassword $sqlPassword `
   -Force
-#>
 
 # Post-deployment configuration begins here
 Write-Host "Performing post-deployment configuration..."
