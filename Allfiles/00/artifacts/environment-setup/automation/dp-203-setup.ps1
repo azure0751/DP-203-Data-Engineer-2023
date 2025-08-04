@@ -317,7 +317,9 @@ try {
 
 $dataLakeContext = New-AzStorageContext -StorageAccountName $dataLakeAccountName -StorageAccountKey $dataLakeStorageAccountKey
 
-$destinationSasKey = New-AzStorageContainerSASToken -Container "wwi-02" -Context $dataLakeContext -Permission rwdl
+$destinationSasKey = New-AzStorageContainerSASToken -Container "wwi-02" -Context $dataLakeContext -Permission rwdl -ExpiryTime (Get-Date).AddHours(5)
+
+
 
 Write-Host "Destination Sas key : "$destinationSasKey
 }
